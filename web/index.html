@@ -8,6 +8,7 @@
     <title>Open Science Database</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="cats.js"></script>
 	
 	
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -162,44 +163,42 @@
 			}
 		});			
 
-		subject_category=document.getElementById("subject_category")
-		category_list =["Agricultural and Biological Sciences","Arts and Humanities","Biochemistry, Genetics and Molecular Biology","Business, Management and Accounting","Chemical Engineering","Chemistry","Computer Science","Decision Sciences","Dentistry","Earth and Planetary Sciences","Economics, Econometrics and Finance","Energy","Engineering","Environmental Science","Multidisciplinary","HealthProfessions","Immunology and Microbiology","Materials Science","Mathematics","Medicine","Neuroscience","Nursing","Pharmacology, Toxicology and Pharmaceutics","Physics and Astronomy","Psychology","Social Sciences","Veterinary"]		
+		subject_category=document.getElementById("subject_category")	
 		category_list.forEach(function(category) {
 			subject_category.innerHTML+="<option>" + category + "</option>"
-		});
+		});	
+		var data = JSON.parse(cat_sub_json);
 			
 		subject_category.addEventListener('change',(function() {
 			selected_category=$('#subject_category').find(":selected").text();
 			document.getElementById('journals_table_body').innerHTML=''
 			var $dropdown = $(this);
 			var key = $dropdown.val();
-			var vals = [];
-			
-			$.getJSON('cats.json', function(data) {
-				category_list.forEach(function(category) {
-					if (category==key){
-						vals = data[category].split(";");
-						return false
-					}
-				});
-
-				var $secondChoice = $("#subject");
-				$secondChoice.empty();
-				$.each(vals, function(index, value) {
-					$secondChoice.append("<option>" + value + "</option>");
-				});
-				if (selected_category=='Please Select'){
-					$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
-					$("#path").text('')
-				}else{
-					$("#path").text(selected_category + ' > ' + selected_subject)
+			var vals = [];			
+			category_list.forEach(function(category) {
+				if (category==key){
+					vals = data[category].split(";");
+					return false
 				}
-				if (!subject_param){
-					find_journals(0)
-				}				
-				selected_subject=$('#subject').find(":selected").text();
-				top_articles(selected_subject)
-			});							
+			});
+
+			var $secondChoice = $("#subject");
+			$secondChoice.empty();
+			$.each(vals, function(index, value) {
+				$secondChoice.append("<option>" + value + "</option>");
+			});
+			if (selected_category=='Please Select'){
+				$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
+				$("#path").text('')
+			}else{
+				$("#path").text(selected_category + ' > ' + selected_subject)
+			}	
+			if (!subject_param){
+				find_journals(0)
+			}				
+			selected_subject=$('#subject').find(":selected").text();
+			top_articles(selected_subject)
+			
 		}));
 
 		subject=document.getElementById("subject")
@@ -238,7 +237,7 @@
 				find_journals(0)
 			}
 		}else{
-			for (cat in data){
+			for (cat in data){					
 				subjects=(data[cat]).split(';')			
 				for (i = 0; i < subjects.length; i++){
 					if (subjects[i]==subject_param){
@@ -248,8 +247,7 @@
 			}
 			$("#subject_category").val(subject_category_param)
 			var event = new Event('change');
-			subject_category.dispatchEvent(event);
-			
+			subject_category.dispatchEvent(event);				
 			$("#subject").val(subject_param)	
 			subject.dispatchEvent(event);
 			subject_param=null			
@@ -341,6 +339,7 @@
 	}		
 		
 	function top_articles(subject){
+	return
 		if (subject=='Please select a category first') {
 			subject=''
 		}
@@ -360,7 +359,6 @@
 		 "group by ?s ?title ?citation ?journal ?year",
 		 limit,
 		].join(" ");	
-		console.log(query)
 		url=endpoint+'?query='+encodeURIComponent(query) +"&format=json";
 			return $.ajax({
 				url: url,

@@ -8,6 +8,7 @@
     <title>Scholarly Journals Database</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="cats.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel = "stylesheet" type = "text/css" href = "css/style.css">
 
@@ -236,7 +237,6 @@
 					if ('author' in item){
 						for (j=0; j<Math.min(5,item['author'].length);j++){				
 							author=item['author'][j]
-							console.log(author)
 							if ('given' in author) authors += author['given']+' '					
 							if ('family' in author)	authors += author['family']+'; '
 						}
