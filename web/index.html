@@ -39,7 +39,7 @@
 		<br></br>
 		<div align="center" class="starter-template">
 		<h1>Scholarly Journals Database</h1>		
-		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 41,024 Journals - 11 Million Articles - 36 Million Citations </h5>
+		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 41,240 Journals - 11 Million Articles - 36 Million Citations </h5>
 		</div>
 		<br>
 		
@@ -261,7 +261,7 @@
 	function find_journals(offset){
 	$(".loader").show()
 	offset_global=offset+20
-	endpoint='http://brdb.warrington.ufl.edu:3030/test15/query';
+	endpoint='http://brdb.warrington.ufl.edu:3030/tmp/query';
 	search=document.getElementById("user_input").value.toLowerCase();
 	filter=' filter(regex(lcase(?title),"'+search+'")) ';
 	var e = document.getElementById("subject");
@@ -343,12 +343,11 @@
 	}		
 		
 	function top_articles(subject){
-	console.log(subject)
 		if (subject=='Please select a category first') {
 			subject=''
 		}
 		endpoint='http://brdb.warrington.ufl.edu:3030/test2/query';
-
+		filter=" <e:subject> '"+subject+"'. " 
 		limit='limit 20';
 		var query = [
 		 "select ?s ?title ?citation ?journal ?year (group_concat(?author) as ?authors)",
@@ -358,13 +357,13 @@
 			"<e:journal> ?journal;",
 			"<e:year> ?year;",
 			"<e:authors> ?author;",
+			filter,
 		 "}",
 		 "group by ?s ?title ?citation ?journal ?year",
 		 limit,
 		].join(" ");	
+		console.log(query)
 		url=endpoint+'?query='+encodeURIComponent(query) +"&format=json";
-					console.log(query)
-
 			return $.ajax({
 				url: url,
 				method: 'GET'
