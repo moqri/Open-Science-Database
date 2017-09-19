@@ -39,7 +39,7 @@
 		<br></br>
 		<br></br>
 		<div align="center" class="starter-template">
-		<h1>Scholarly Journals Database</h1>		
+		<h1>Open Science Database</h1>		
 		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 40,136 Journals - 11 Million Articles - 36 Million Citations </h5>
 		</div>
 		<br>
@@ -59,6 +59,7 @@
 	  </div>
 	</div>
 	<br>
+	<input type="text" id="hidden_cat" value="">
 	<input type="text" id="hidden_subject" value="">
 	<br>
 
@@ -128,6 +129,7 @@
 
 	<script>
 	$(document).ready(function(){
+		$("#hidden_cat").hide();	
 		$("#hidden_subject").hide();	
 		
 		$(".nav-tabs a").click(function(e){
@@ -148,10 +150,7 @@
 		if (articles_param){
 			$('.nav-tabs a[href="#articles"]').tab('show')
 		}
-		
-		
-		//document.getElementById('articles_tab').className = 'active';
-
+			
 		if (open_param){
 			document.getElementById("open_check").checked=true
 		}
@@ -171,6 +170,9 @@
 			
 		subject_category.addEventListener('change',(function() {
 			selected_category=$('#subject_category').find(":selected").text();
+			$("#hidden_cat").val(selected_category)
+			hidden_subject=$("#hidden_cat").val()
+			
 			document.getElementById('journals_table_body').innerHTML=''
 			var $dropdown = $(this);
 			var key = $dropdown.val();
@@ -181,7 +183,6 @@
 					return false
 				}
 			});
-
 			var $secondChoice = $("#subject");
 			$secondChoice.empty();
 			$.each(vals, function(index, value) {
@@ -197,8 +198,7 @@
 				find_journals(0)
 			}				
 			selected_subject=$('#subject').find(":selected").text();
-			top_articles(selected_subject)
-			
+			top_articles(selected_subject)			
 		}));
 
 		subject=document.getElementById("subject")
@@ -210,8 +210,9 @@
 			top_articles(selected_subject)
 			$("#path").text(selected_category + ' > ' + selected_subject)
 			$("#hidden_subject").val(selected_subject)
-			hidden_subject=$("#hidden_subject").val()
+			hidden_subject=$("#hidden_subject").val()			
 		}))
+		
 		top_articles('')
 		open_check=document.getElementById("open_check")
 		open_check.addEventListener('change',(function() {
@@ -229,9 +230,17 @@
 		}
 		
 		if (!subject_param){
+			hidden_cat=$("#hidden_cat").val()
+			if (hidden_cat!=''){		
+				$("#subject_category").val(hidden_cat)
+				var event = new Event('change');
+				subject_category.dispatchEvent(event);	
+			}
+			
 			hidden_subject=$("#hidden_subject").val()
 			if (hidden_subject!=''){
 				$("#subject").val(hidden_subject)
+				var event = new Event('change');				
 				subject.dispatchEvent(event);
 			}else{//index
 				find_journals(0)
