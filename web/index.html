@@ -154,9 +154,7 @@
 		if (open_param){
 			document.getElementById("open_check").checked=true
 		}
-		
-		//var data = JSON.parse(cats_dict);
-		
+				
 		$('#user_input').keypress(function(e){
 			if(e.keyCode==13){
 				document.getElementById('journals_table_body').innerHTML=''
@@ -177,7 +175,7 @@
 			var key = $dropdown.val();
 			var vals = [];
 			
-			$.getJSON('data/cats.json', function(data) {
+			$.getJSON('cats.json', function(data) {
 				category_list.forEach(function(category) {
 					if (category==key){
 						vals = data[category].split(";");
