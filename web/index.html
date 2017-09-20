@@ -129,9 +129,7 @@
 
 	<script>
 	$(document).ready(function(){
-		$("#hidden_cat").hide();	
-		$("#hidden_subject").hide();	
-		
+			
 		$(".nav-tabs a").click(function(e){
 			e.preventDefault()
 			$(this).tab('show');
@@ -157,21 +155,19 @@
 				
 		$('#user_input').keypress(function(e){
 			if(e.keyCode==13){
-				document.getElementById('journals_table_body').innerHTML=''
-				find_journals(0);
+				user_action('input_entered')
 			}
-		});			
-
+		});	
+				
+		var data = JSON.parse(cat_sub_json);		
 		subject_category=document.getElementById("subject_category")	
 		category_list.forEach(function(category) {
 			subject_category.innerHTML+="<option>" + category + "</option>"
-		});	
-		var data = JSON.parse(cat_sub_json);
-			
+		});			
 		subject_category.addEventListener('change',(function() {
 			selected_category=$('#subject_category').find(":selected").text();
 			$("#hidden_cat").val(selected_category)
-			hidden_subject=$("#hidden_cat").val()
+			hidden_cat=$("#hidden_cat").val()
 			
 			document.getElementById('journals_table_body').innerHTML=''
 			var $dropdown = $(this);
@@ -192,59 +188,50 @@
 				$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
 				$("#path").text('')
 			}else{
+				selected_subject=$('#subject').find(":selected").text();				
 				$("#path").text(selected_category + ' > ' + selected_subject)
-			}	
-			if (!subject_param){
-				find_journals(0)
-			}				
+			}
+			user_action('cat_changed')			
 			selected_subject=$('#subject').find(":selected").text();
 			top_articles(selected_subject)			
 		}));
 
-		subject=document.getElementById("subject")
+
+		subject=document.getElementById("subject")			
 		subject.addEventListener('change',(function() {
-			document.getElementById('journals_table_body').innerHTML=''
-			find_journals(0)
+			document.getElementById('journals_table_body').innerHTML=''			
 			selected_category=$('#subject_category').find(":selected").text();
 			selected_subject=$('#subject').find(":selected").text();
 			top_articles(selected_subject)
 			$("#path").text(selected_category + ' > ' + selected_subject)
 			$("#hidden_subject").val(selected_subject)
 			hidden_subject=$("#hidden_subject").val()			
+			user_action('sub_changed')			
 		}))
 		
-		top_articles('')
-		open_check=document.getElementById("open_check")
+		open_check=document.getElementById("open_check")		
 		open_check.addEventListener('change',(function() {
 			document.getElementById('journals_table_body').innerHTML=''
-			find_journals(0)
+			user_action('open_checked')			
 		}))
 
-
-		selected_category=$('#subject_category').find(":selected").text();	
-		if (selected_category!='Please Select'){
-			var event = new Event('change');
-			subject_category.dispatchEvent(event);
-		}else{
-			selected_subject='Please select a category first'
-		}
-		
+		selected_category=$('#subject_category').find(":selected").text();					
 		if (!subject_param){
 			hidden_cat=$("#hidden_cat").val()
 			if (hidden_cat!=''){		
 				$("#subject_category").val(hidden_cat)
 				var event = new Event('change');
 				subject_category.dispatchEvent(event);	
-			}
-			
+			}			
 			hidden_subject=$("#hidden_subject").val()
+			
 			if (hidden_subject!=''){
 				$("#subject").val(hidden_subject)
 				var event = new Event('change');				
 				subject.dispatchEvent(event);
 			}else{//index
 				find_journals(0)
-			}
+			}			
 		}else{
 			for (cat in data){					
 				subjects=(data[cat]).split(';')			
@@ -261,8 +248,28 @@
 			subject.dispatchEvent(event);
 			subject_param=null			
 		}		
+		top_articles('')
 	});
-
+	
+	function user_action(action_type){
+		if (action_type=='input_entered'){
+			document.getElementById('journals_table_body').innerHTML=''
+			find_journals(0);
+		}
+		if (action_type=='cat_changed'){
+			if (!subject_param){
+				change_cat=0
+				find_journals(0)
+			}
+		}	
+		if (action_type=='sub_changed'){
+			find_journals(0)
+		}			
+		if (action_type=='open_chaecked'){
+			find_journals(0)
+		}		
+	}
+	
 	function find_journals(offset){
 	$(".loader").show()
 	offset_global=offset+20
