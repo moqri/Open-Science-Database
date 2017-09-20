@@ -216,7 +216,11 @@
 		}))
 
 		selected_category=$('#subject_category').find(":selected").text();					
-		if (!subject_param){
+		if (!subject_param && hidden_subject==''){
+			console.log("no hidden sub")
+			find_journals(0)
+			}
+		if (!subject_param && hidden_subject!=''){
 			console.log("no param")
 			hidden_cat=$("#hidden_cat").val()
 			if (hidden_cat!=''){	
@@ -226,9 +230,7 @@
 				subject_category.dispatchEvent(event);	
 			}			
 			hidden_subject=$("#hidden_subject").val()
-			if (hidden_subject==''){//index
-				console.log("no hidden sub")
-				find_journals(0)
+
 			}else {
 				console.log("hidden sub")
 				$("#subject").val(hidden_subject)
