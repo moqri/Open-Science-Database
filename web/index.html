@@ -67,32 +67,16 @@
 	<br>
 	
 <div class="container">
-  <ul class="nav nav-tabs">
-    <li id="journals_li" class="active"><a href="#journals">Journals</a></li>
-    <li id="articles_li" ><a href="#articles">Articles</a></li>
-  </ul>
+
 
   <div id="tabs" class="tab-content">
     <div id="journals" class="tab-pane active">
 		<div class="row">
 		<br>
-		  <div class="col-sm-6">
-				<label>Filter by Journal Name:</label>
-				<input class="form-control" type="text" id="user_input"> 
-
-		  </div>
-			<div class="col-sm-6">	  
-				<div class="form-check">
-					<label class="form-check-label">
-						<input class="form-check-input" type="checkbox" id="open_check"></input> Only Open Access Journals
-					</label>
-				</div>
-			</div>
-		</div>
 		<table class="table" id="journals_table">
 			<thead>
 				<tr>
-					<th>Open</th><th>Title</th><th>Publisher</th><th>Articles</th><th>Citations</th><th>Impact (Citations/Articles)</th><th>h3 Index</th>
+					<th><input class="form-control" type="text" id="user_input" placeholder="Journal Title"> </th><th>Publisher</th><th>Articles</th><th>Citations</th><th>Impact (Citations/Articles)</th><th>h3 Index</th><th>Open <input class="form-check-input" type="checkbox" id="open_check"></input></th>
 				</tr>	        
 			</thead>
 			<tbody id="journals_table_body">
@@ -100,22 +84,6 @@
 		</table>
 		<div class="loader"></div>
 		<button id="load_more" class="btn btn-link" type="submit" onclick="find_journals(offset_global);">Load more</button>
-    </div>
-    <div id="articles" class="tab-pane">
-		<h5> Top 20 Articles published between August 2014 to August 2017</h3>
-		<table id='articles_table' class="table">
-			<thead>
-				<tr>
-					<th>Title</th>
-					<th>Authors</th>
-					<th>Journal</th>
-					<th>Year-Month</th>
-					<th>Citations</th>
-				</tr>	        
-			</thead>
-			<tbody id="articles_table_body">			
-			</tbody>
-		</table>
     </div>
   </div>
  
@@ -272,7 +240,7 @@
 		if (action_type=='sub_changed'){
 			find_journals(0)
 		}			
-		if (action_type=='open_chaecked'){
+		if (action_type=='open_checked'){
 			find_journals(0)
 		}		
 	}
@@ -335,7 +303,6 @@
 					
 							
 					document.getElementById('journals_table_body').innerHTML += '<tr>\
-					<td>'+open+'</td>\
 					<td><a href=journal.html?issn='+issn+
 					'&title='+encodeURIComponent(title)+
 					'&publisher='+encodeURIComponent(publisher)+
@@ -345,6 +312,7 @@
 					<td>'+citation+'</td>\
 					<td>'+impact+'</td>\
 					<td>'+h+'</td>\
+					<td>'+open+'</td>\
 					</tr>'			
 				});
 			$(".loader").hide();
