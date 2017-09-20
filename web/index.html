@@ -217,22 +217,26 @@
 
 		selected_category=$('#subject_category').find(":selected").text();					
 		if (!subject_param){
+			console.log("no param")
 			hidden_cat=$("#hidden_cat").val()
-			if (hidden_cat!=''){		
+			if (hidden_cat!=''){	
+				console.log("no hidden cat")
 				$("#subject_category").val(hidden_cat)
 				var event = new Event('change');
 				subject_category.dispatchEvent(event);	
 			}			
 			hidden_subject=$("#hidden_subject").val()
-			
-			if (hidden_subject!=''){
+			if (hidden_subject==''){//index
+				console.log("no hidden sub")
+				find_journals(0)
+			}else {
+				console.log("hidden sub")
 				$("#subject").val(hidden_subject)
 				var event = new Event('change');				
 				subject.dispatchEvent(event);
-			}else{//index
-				find_journals(0)
-			}			
+			}
 		}else{
+			console.log("param")
 			for (cat in data){					
 				subjects=(data[cat]).split(';')			
 				for (i = 0; i < subjects.length; i++){
