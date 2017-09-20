@@ -1,2 +1,2 @@
-# Science-Database
-A Database of Scientific Publications
+# Open Science-Database
+An Open Database of Scientific Publications
