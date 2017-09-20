@@ -128,8 +128,10 @@
 	</div>
 
 	<script>
-	$(document).ready(function(){
-			
+	$(document).ready(function(){		
+		$("#hidden_subject").hide();	
+		$("#hidden_cat").hide();	
+	
 		$(".nav-tabs a").click(function(e){
 			e.preventDefault()
 			$(this).tab('show');
@@ -144,6 +146,7 @@
 		subject_param=getParameterByName('subject')
 		open_param=getParameterByName('open')
 		articles_param=getParameterByName('articles')
+		var back_page=0
 		
 		if (articles_param){
 			$('.nav-tabs a[href="#articles"]').tab('show')
@@ -191,9 +194,11 @@
 				selected_subject=$('#subject').find(":selected").text();				
 				$("#path").text(selected_category + ' > ' + selected_subject)
 			}
-			user_action('cat_changed')			
-			selected_subject=$('#subject').find(":selected").text();
-			top_articles(selected_subject)			
+			if (back_page==0){
+				user_action('cat_changed')			
+				selected_subject=$('#subject').find(":selected").text();
+				top_articles(selected_subject)			
+			}
 		}));
 
 
@@ -215,29 +220,25 @@
 			user_action('open_checked')			
 		}))
 
-		selected_category=$('#subject_category').find(":selected").text();					
-		if (!subject_param && hidden_subject==''){
-			console.log("no hidden sub")
+		selected_category=$('#subject_category').find(":selected").text();	
+		hidden_subject=$("#hidden_subject").val()
+		if (!subject_param && hidden_subject==''){//main
+			console.log("main")
 			find_journals(0)
-			}
-		if (!subject_param && hidden_subject!=''){
-			console.log("no param")
+		}
+		if (!subject_param && hidden_subject!=''){//back
+			console.log(hidden_subject)
+			console.log("back")
 			hidden_cat=$("#hidden_cat").val()
-			if (hidden_cat!=''){	
-				console.log("no hidden cat")
-				$("#subject_category").val(hidden_cat)
-				var event = new Event('change');
-				subject_category.dispatchEvent(event);	
-			}			
 			hidden_subject=$("#hidden_subject").val()
-
-			}else {
-				console.log("hidden sub")
-				$("#subject").val(hidden_subject)
-				var event = new Event('change');				
-				subject.dispatchEvent(event);
-			}
-		}else{
+			$("#subject_category").val(hidden_cat)
+			var event = new Event('change');
+			back_page=1
+			subject_category.dispatchEvent(event);	
+			$("#subject").val(hidden_subject)
+			subject.dispatchEvent(event);
+		}
+		if (subject_param){//from journal page
 			console.log("param")
 			for (cat in data){					
 				subjects=(data[cat]).split(';')			
