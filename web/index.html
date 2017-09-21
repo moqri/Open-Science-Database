@@ -40,7 +40,7 @@
 		<br></br>
 		<div align="center" class="starter-template">
 		<h1>Open Science Database</h1>		
-		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 40,136 Journals - 11 Million Articles - 36 Million Citations </h5>
+		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 40,136 Journals - 12 Million Articles - 36 Million Citations </h5>
 		</div>
 		<br>
 		
@@ -111,7 +111,9 @@
 	</footer>
 
 	<script>
-	$(document).ready(function(){		
+	var log = console.log.bind(console);
+
+	$(document).ready(function(){	
 		$("#hidden_subject").hide();	
 		$("#hidden_cat").hide();	
 	
@@ -206,12 +208,9 @@
 		selected_category=$('#subject_category').find(":selected").text();	
 		hidden_subject=$("#hidden_subject").val()
 		if (!subject_param && hidden_subject==''){//main
-			console.log("main")
 			find_journals(0)
 		}
 		if (!subject_param && hidden_subject!=''){//back
-			console.log(hidden_subject)
-			console.log("back")
 			hidden_cat=$("#hidden_cat").val()
 			hidden_subject=$("#hidden_subject").val()
 			$("#subject_category").val(hidden_cat)
@@ -222,7 +221,6 @@
 			subject.dispatchEvent(event);
 		}
 		if (subject_param){//from journal page
-			console.log("param")
 			for (cat in data){					
 				subjects=(data[cat]).split(';')			
 				for (i = 0; i < subjects.length; i++){
@@ -345,7 +343,6 @@
 	}		
 		
 	function top_articles(subject){
-	return
 		if (subject=='Please select a category first') {
 			subject=''
 		}
@@ -394,7 +391,6 @@
 
   ga('create', 'UA-96980151-3', 'auto');
   ga('send', 'pageview');
-
 </script>	
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </body>
