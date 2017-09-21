@@ -357,13 +357,16 @@
 		 limit,
 		].join(" ");	
 		url=endpoint+'os_articles/query?query='+encodeURIComponent(query) +"&format=json";
+				log(url)
+
 			return $.ajax({
 				url: url,
 				method: 'GET'
 			}).then(function(data) {
 			articles=data['results']['bindings'];	
+			document.getElementById('articles_table_body').innerHTML=''
 			articles.forEach(function(article){
-				doi=article['doi']['value'].replace(endpoint,'');
+				doi=article['doi']['value'].replace(endpoint+'os_articles/','');
 				title=article['title']['value'];
 				citation=article['citation']['value'];			
 				year=article['year']['value'];	
