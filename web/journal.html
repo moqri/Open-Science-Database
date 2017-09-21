@@ -115,6 +115,7 @@
 	</div>
 </body>
 <script>
+	endpoint='http://brdb.warrington.ufl.edu:3030/'
 	function getParameterByName(name, url) {
 	    if (!url) url = window.location.href;
 	    name = name.replace(/[\[\]]/g, "\\$&");
@@ -136,9 +137,7 @@
 	}
 
 	function get_journal(issn){
-		base='http://brdb.warrington.ufl.edu:3030/tmp/'
-		s='<'+base+issn+'>'
-		endpoint=base+'query'
+		s='<'+endpoint+'os_journals/'+issn+'>'
 		limit='limit 1000';
 		var query = [
 		 "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>",
@@ -169,7 +168,7 @@
 		 "ORDER BY DESC(?h)",
 		 limit 
 		].join(" ");	
-		url=endpoint+'?query='+encodeURIComponent(query) +"&format=json";
+		url=endpoint+'os_journals/query?query='+encodeURIComponent(query) +"&format=json";
 			return $.ajax({
 				url: url,
 				method: 'GET'

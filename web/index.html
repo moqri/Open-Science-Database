@@ -40,7 +40,7 @@
 		<br></br>
 		<div align="center" class="starter-template">
 		<h1>Open Science Database</h1>		
-		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 40,136 Journals - 12 Million Articles - 36 Million Citations </h5>
+		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 42,339 Journals - 12 Million Articles - 36 Million Citations </h5>
 		</div>
 		<br>
 		
@@ -127,7 +127,8 @@
 			$(".act span").text(x);
 			$(".prev span").text(y);
 		});
-		
+
+		endpoint='http://brdb.warrington.ufl.edu:3030/'
 		subject_param=getParameterByName('subject')
 		open_param=getParameterByName('open')
 		articles_param=getParameterByName('articles')
@@ -178,6 +179,8 @@
 			}else{
 				selected_subject=$('#subject').find(":selected").text();				
 				$("#path").text(selected_category + ' > ' + selected_subject)
+				$("#hidden_subject").val(selected_subject)
+
 			}
 			if (back_page==0){
 				user_action('cat_changed')			
@@ -207,10 +210,10 @@
 
 		selected_category=$('#subject_category').find(":selected").text();	
 		hidden_subject=$("#hidden_subject").val()
-		if (!subject_param && hidden_subject==''){//main
+		if (!subject_param && hidden_subject==''){//landed directly on main
 			find_journals(0)
 		}
-		if (!subject_param && hidden_subject!=''){//back
+		if (!subject_param && hidden_subject!=''){//landed using a back button
 			hidden_cat=$("#hidden_cat").val()
 			hidden_subject=$("#hidden_subject").val()
 			$("#subject_category").val(hidden_cat)
@@ -220,7 +223,7 @@
 			$("#subject").val(hidden_subject)
 			subject.dispatchEvent(event);
 		}
-		if (subject_param){//from journal page
+		if (subject_param){//landed from the journal page
 			for (cat in data){					
 				subjects=(data[cat]).split(';')			
 				for (i = 0; i < subjects.length; i++){
@@ -261,7 +264,6 @@
 	function find_journals(offset){
 	$(".loader").show()
 	offset_global=offset+20
-	endpoint='http://brdb.warrington.ufl.edu:3030/tmp/query';
 	search=document.getElementById("user_input").value.toLowerCase();
 	filter=' filter(regex(lcase(?title),"'+search+'")) ';
 	var e = document.getElementById("subject");
@@ -291,7 +293,7 @@
 	 limit,
 	 'OFFSET '+ offset.toString()
 	].join(" ");	
-		url=endpoint+'?query='+encodeURIComponent(query) +"&format=json";
+		url=endpoint+'os_journals/query?query='+encodeURIComponent(query) +"&format=json";
 			return $.ajax({
 				url: url,
 				method: 'GET'
@@ -330,7 +332,57 @@
 				});
 			$(".loader").hide();
 			});
-		};
+		};	
+		
+	function top_articles(subject){
+		if (subject=='Please select a category first') {
+			subject=''
+		}
+		filter=" <e:subject> '"+subject+"'. " 
+		limit='limit 20';
+		var query = [
+		 "select ?doi ?title ?citation ?journal ?year ?issn ?publisher (group_concat(?author; separator=', ') as ?authors)",
+		 "WHERE {",
+			"?doi <e:title> ?title;",
+			"<e:cite> ?citation;",
+			"<e:journal> ?journal;",
+			"<e:year> ?year;",
+			"<e:authors> ?author;",
+			"<e:issn> ?issn;",
+			"<e:pub> ?publisher;",
+			filter,
+		 "}",
+		 "group by ?doi ?title ?citation ?journal ?year ?issn ?publisher",
+		 "ORDER BY DESC(?citation)",
+		 limit,
+		].join(" ");	
+		url=endpoint+'os_articles/query?query='+encodeURIComponent(query) +"&format=json";
+			return $.ajax({
+				url: url,
+				method: 'GET'
+			}).then(function(data) {
+			articles=data['results']['bindings'];	
+			articles.forEach(function(article){
+				doi=article['doi']['value'].replace(endpoint,'');
+				title=article['title']['value'];
+				citation=article['citation']['value'];			
+				year=article['year']['value'];	
+				journal=article['journal']['value'];					
+				authors=article['authors']['value'];
+				issn=article['issn']['value'];
+				publisher=article['publisher']['value'];
+				title_td= '<a href=https://doi.org/'+doi+'>' +title+'</a></td>';
+				journal_td=	'<a href=journal.html?issn='+issn+'&title='+encodeURIComponent(journal)+'&publisher='+encodeURIComponent(publisher)+'>' +journal+'</a>'			
+				document.getElementById('articles_table_body').innerHTML += '<tr>\
+				<td>'+title_td+'</td>\
+				<td>'+authors+'</td>\
+				<td>'+journal_td+'</td>\
+				<td>'+year+'</td>\
+				<td>'+citation+'</td>\
+				</tr>'			
+			});
+		});
+	}	
 
 	function getParameterByName(name, url) {
 	    if (!url) url = window.location.href;
@@ -340,49 +392,6 @@
 	    if (!results) return null;
 	    if (!results[2]) return '';
 	    return decodeURIComponent(results[2].replace(/\+/g, " "));
-	}		
-		
-	function top_articles(subject){
-		if (subject=='Please select a category first') {
-			subject=''
-		}
-		endpoint='http://brdb.warrington.ufl.edu:3030/test2/query';
-		filter=" <e:subject> '"+subject+"'. " 
-		limit='limit 20';
-		var query = [
-		 "select ?s ?title ?citation ?journal ?year (group_concat(?author) as ?authors)",
-		 "WHERE {",
-			"?s <e:title> ?title;",
-			"<e:cite> ?citation;",
-			"<e:journal> ?journal;",
-			"<e:year> ?year;",
-			"<e:authors> ?author;",
-			filter,
-		 "}",
-		 "group by ?s ?title ?citation ?journal ?year",
-		 limit,
-		].join(" ");	
-		url=endpoint+'?query='+encodeURIComponent(query) +"&format=json";
-			return $.ajax({
-				url: url,
-				method: 'GET'
-			}).then(function(data) {
-			articles=data['results']['bindings'];		
-			articles.forEach(function(article){
-				title=article['title']['value'];
-				citation=article['citation']['value'];			
-				year=article['year']['value'];	
-				journal=article['journal']['value'];					
-				authors=article['authors']['value'];					
-				document.getElementById('articles_table_body').innerHTML += '<tr>\
-				<td>'+title+'</td>\
-				<td>'+authors+'</td>\
-				<td>'+journal+'</td>\
-				<td>'+year+'</td>\
-				<td>'+citation+'</td>\
-				</tr>'			
-			});
-		});
 	}	
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
