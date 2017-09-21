@@ -184,8 +184,7 @@
 			}
 			if (back_page==0){
 				user_action('cat_changed')			
-				selected_subject=$('#subject').find(":selected").text();
-				top_articles(selected_subject)			
+				top_articles()			
 			}
 		}));
 
@@ -195,19 +194,18 @@
 			document.getElementById('journals_table_body').innerHTML=''			
 			selected_category=$('#subject_category').find(":selected").text();
 			selected_subject=$('#subject').find(":selected").text();
-			top_articles(selected_subject)
 			$("#path").text(selected_category + ' > ' + selected_subject)
 			$("#hidden_subject").val(selected_subject)
 			hidden_subject=$("#hidden_subject").val()			
 			user_action('sub_changed')		
-			top_articles(selected_subject)	
+			top_articles()	
 		}))
 		
 		open_check=document.getElementById("open_check")		
 		open_check.addEventListener('change',(function() {
 			document.getElementById('journals_table_body').innerHTML=''
 			user_action('open_checked')	
-			top_articles(selected_subject)	
+			top_articles()	
 		}))
 
 		selected_category=$('#subject_category').find(":selected").text();	
@@ -241,7 +239,7 @@
 			subject.dispatchEvent(event);
 			subject_param=null			
 		}		
-		top_articles('')
+		top_articles()
 	});
 	
 	function user_action(action_type){
@@ -336,11 +334,13 @@
 			});
 		};	
 		
-	function top_articles(subject){
-		if (subject=='Please select a category first') {
-			subject=''
+	function top_articles(){
+	var e = document.getElementById("subject");
+	var selected_subject = e.options[e.selectedIndex].text;	
+		if (selected_subject=='Please select a category first') {
+			selected_subject=''
 		}
-		filter=" <e:subject> '"+subject+"'. " 
+		filter=" <e:subject> '"+selected_subject+"'. " 
 		limit='limit 20';
 		var query = [
 		 "select ?doi ?title ?citation ?journal ?year ?issn ?publisher (group_concat(?author; separator=', ') as ?authors)",
