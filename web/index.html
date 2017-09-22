@@ -202,7 +202,7 @@
 			$("#hidden_subject").val(selected_subject)
 			hidden_subject=$("#hidden_subject").val()			
 			user_action('sub_changed')		
-			//top_articles()	
+			top_articles()	
 		}))
 		
 		open_check=document.getElementById("open_check")		
@@ -272,13 +272,16 @@
 	filter=' filter(regex(lcase(?title),"'+search+'")) ';
 	var e = document.getElementById("subject");
 	var selected_subject = e.options[e.selectedIndex].text;	
+	var selected_category=$('#subject_category').find(":selected").text();
+
 	if (selected_subject!='Please select a category first'){
-		if (selected_subject=='All Subjects (within the category'){
+		if (selected_subject=='All Subjects (within the category)'){
 			filter="?s <e:category> '"+selected_category+"'. " + filter
 		}else{
 			filter="?s <e:subjects> '"+selected_subject+"'. " + filter
 		}
 	}
+
 	if (document.getElementById("open_check").checked){
 		filter="?s <e:open> 1. "+filter
 	}
@@ -301,7 +304,7 @@
 	 limit,
 	 'OFFSET '+ offset.toString()
 	].join(" ");	
-		url=endpoint+'os_journals/query?query='+encodeURIComponent(query) +"&format=json";
+		url=endpoint+'tmp/query?query='+encodeURIComponent(query) +"&format=json";
 			return $.ajax({
 				url: url,
 				method: 'GET'
@@ -344,11 +347,21 @@
 		
 	function top_articles(){
 	var e = document.getElementById("subject");
+
+	var selected_category=$('#subject_category').find(":selected").text();
 	var selected_subject = e.options[e.selectedIndex].text;	
-		if (selected_subject=='Please select a category first') {
-			selected_subject=''
+
+	if (selected_subject!='Please select a category first'){
+		if (selected_subject=='All Subjects (within the category)'){
+			filter="<e:category> '"+selected_category+"'. " 
+		}else{
+			filter="<e:subject> '"+selected_subject+"'. "
 		}
-		filter=" <e:subject> '"+selected_subject+"'. " 
+	}else{
+		filter=''
+	}
+
+
 		limit='limit 20';
 		var query = [
 		 "select ?doi ?title ?citation ?journal ?year ?issn ?publisher (group_concat(?author; separator=', ') as ?authors)",
@@ -366,9 +379,8 @@
 		 "ORDER BY DESC(?citation)",
 		 limit,
 		].join(" ");	
-		url=endpoint+'os_articles/query?query='+encodeURIComponent(query) +"&format=json";
-				log(url)
-
+		url=endpoint+'tmp_top/query?query='+encodeURIComponent(query) +"&format=json";
+		log(query)
 			return $.ajax({
 				url: url,
 				method: 'GET'
