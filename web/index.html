@@ -48,7 +48,7 @@
 	  <div class="col-sm-6">
 		<label>Category</label> 
 		<select class="form-control" id="subject_category">
-			<option selected value="base">Please Select</option>
+			<option selected value="base">All Science</option>
 		</select>
 	  </div>
 	  <div class="col-sm-6">
@@ -171,7 +171,7 @@
 			var $secondChoice = $("#subject");
 			$secondChoice.empty();
 			
-			if (selected_category=='Please Select'){
+			if (selected_category=='All Science'){
 				$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
 				$("#path").text('')
 			}else{
