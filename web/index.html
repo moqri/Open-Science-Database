@@ -170,9 +170,6 @@
 			});
 			var $secondChoice = $("#subject");
 			$secondChoice.empty();
-			$.each(vals, function(index, value) {
-				$secondChoice.append("<option>" + value + "</option>");
-			});
 			
 			if (selected_category=='Please Select'){
 				$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
@@ -189,6 +186,8 @@
 			if (back_page==0){
 				user_action('cat_changed')			
 				top_articles()			
+			}else{
+				back_page=0
 			}
 		}));
 
@@ -304,7 +303,7 @@
 	 limit,
 	 'OFFSET '+ offset.toString()
 	].join(" ");	
-		url=endpoint+'tmp/query?query='+encodeURIComponent(query) +"&format=json";
+		url=endpoint+'os_journals/query?query='+encodeURIComponent(query) +"&format=json";
 			return $.ajax({
 				url: url,
 				method: 'GET'
@@ -379,7 +378,7 @@
 		 "ORDER BY DESC(?citation)",
 		 limit,
 		].join(" ");	
-		url=endpoint+'tmp_top/query?query='+encodeURIComponent(query) +"&format=json";
+		url=endpoint+'os_articles/query?query='+encodeURIComponent(query) +"&format=json";
 		log(query)
 			return $.ajax({
 				url: url,
