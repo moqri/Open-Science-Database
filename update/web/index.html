@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Open Science Database</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="cats.js"></script>
+	
+	
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel = "stylesheet" type = "text/css" href = "css/style.css">
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="mailto:moqri@ufl.edu">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="container">	
+		<br></br>
+		<br></br>
+		<div align="center" class="starter-template">
+		<h1>Open Science Database</h1>		
+		<h5>Based on <a href="https://www.crossref.org/" target="_blank">Crossref</a> Data (2014-2017) - 42,339 Journals - 12 Million Articles - 36 Million Citations </h5>
+		</div>
+		<br>
+		
+	<div class="row">
+	  <div class="col-sm-6">
+		<label>Category</label> 
+		<select class="form-control" id="subject_category">
+			<option selected value="base">All Science</option>
+		</select>
+	  </div>
+	  <div class="col-sm-6">
+		<label>Subject</label>  
+		<select class="form-control" id="subject">
+		  <option>Please select a category first</option>
+		</select>  
+	  </div>
+	</div>
+	<br>
+	<input type="text" id="hidden_cat" value="">
+	<input type="text" id="hidden_subject" value="">
+	<br>
+
+	<h4 id='path'></h4>
+	<br>
+	
+	<div class="container">
+		<ul class="nav nav-tabs">
+			<li id="journals_li" class="active"><a href="#journals">Journals</a></li>
+			<li id="articles_li" ><a href="#articles">Articles</a></li>
+		</ul>
+		<div id="tabs" class="tab-content">
+			<div id="journals" class="tab-pane active">
+				<br>
+				<table class="table" id="journals_table">
+					<thead>
+						<tr>
+							<th><input class="form-control" type="text" id="user_input" placeholder="Journal Title"></input></th><th>Publisher</th><th>Articles</th><th>Citations</th><th>Impact (Citations/Articles)</th><th>h3 Index</th><th>Open <input class="form-check-input" type="checkbox" id="open_check"></input></th>
+						</tr>	        
+					</thead>
+					<tbody id="journals_table_body">
+					</tbody>
+				</table>
+				<div class="loader"></div>
+				<button id="load_more" class="btn btn-link" type="submit" onclick="find_journals(offset_global);">Load more</button>
+			</div>
+			<div id="articles" class="tab-pane">
+				<h5> Top 20 Articles published between August 2014 to August 2017</h3>
+				<table id='articles_table' class="table">
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Authors</th>
+							<th>Journal</th>
+							<th>Year-Month</th>
+							<th>Citations</th>
+						</tr>	        
+					</thead>
+					<tbody id="articles_table_body">			
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+	  <br>
+	  <p></p>
+	</footer>
+
+	<script>
+	var log = console.log.bind(console);
+
+	$(document).ready(function(){	
+		$("#hidden_subject").hide();	
+		$("#hidden_cat").hide();	
+	
+		$(".nav-tabs a").click(function(e){
+			e.preventDefault()
+			$(this).tab('show');
+		});
+		$('.nav-tabs a').on('shown.bs.tab', function(event){
+			var x = $(event.target).text();         // active tab
+			var y = $(event.relatedTarget).text();  // previous tab
+			$(".act span").text(x);
+			$(".prev span").text(y);
+		});
+
+		endpoint='http://brdb.warrington.ufl.edu:3030/'
+		subject_param=getParameterByName('subject')
+		open_param=getParameterByName('open')
+		articles_param=getParameterByName('articles')
+		var back_page=0
+		
+		if (articles_param){
+			$('.nav-tabs a[href="#articles"]').tab('show')
+		}
+			
+		if (open_param){
+			document.getElementById("open_check").checked=true
+		}
+				
+		$('#user_input').keypress(function(e){
+			if(e.keyCode==13){
+				user_action('input_entered')
+			}
+		});	
+				
+		var data = JSON.parse(cat_sub_json);		
+		subject_category=document.getElementById("subject_category")	
+		category_list.forEach(function(category) {
+			subject_category.innerHTML+="<option>" + category + "</option>"
+		});			
+		subject_category.addEventListener('change',(function() {
+			selected_category=$('#subject_category').find(":selected").text();
+			$("#hidden_cat").val(selected_category)
+			hidden_cat=$("#hidden_cat").val()
+			
+			document.getElementById('journals_table_body').innerHTML=''
+			var $dropdown = $(this);
+			var key = $dropdown.val();
+			var vals = [];			
+			category_list.forEach(function(category) {
+				if (category==key){
+					vals = data[category].split(";");
+					return false
+				}
+			});
+			var $secondChoice = $("#subject");
+			$secondChoice.empty();
+			
+			if (selected_category=='All Science'){
+				$secondChoice.append("<option>" + 'Please select a category first' + "</option>");
+				$("#path").text('')
+			}else{
+				$secondChoice.append("<option>" + 'All Subjects (within the category)' + "</option>");
+				$.each(vals, function(index, value) {
+					$secondChoice.append("<option>" + value + "</option>");
+				});				
+				selected_subject=$('#subject').find(":selected").text();				
+				$("#path").text(selected_category + ' > ' + selected_subject)
+				$("#hidden_subject").val(selected_subject)
+			}
+			if (back_page==0){
+				user_action('cat_changed')			
+				top_articles()			
+			}else{
+				back_page=0
+			}
+		}));
+
+
+		subject=document.getElementById("subject")			
+		subject.addEventListener('change',(function() {
+			document.getElementById('journals_table_body').innerHTML=''			
+			selected_category=$('#subject_category').find(":selected").text();
+			selected_subject=$('#subject').find(":selected").text();
+			$("#path").text(selected_category + ' > ' + selected_subject)
+			$("#hidden_subject").val(selected_subject)
+			hidden_subject=$("#hidden_subject").val()			
+			user_action('sub_changed')		
+			top_articles()	
+		}))
+		
+		open_check=document.getElementById("open_check")		
+		open_check.addEventListener('change',(function() {
+			document.getElementById('journals_table_body').innerHTML=''
+			user_action('open_checked')	
+			top_articles()	
+		}))
+
+		selected_category=$('#subject_category').find(":selected").text();	
+		hidden_subject=$("#hidden_subject").val()
+		if (!subject_param && hidden_subject==''){//landed directly on main
+			find_journals(0)
+		}
+		if (!subject_param && hidden_subject!=''){//landed using a back button
+			hidden_cat=$("#hidden_cat").val()
+			hidden_subject=$("#hidden_subject").val()
+			$("#subject_category").val(hidden_cat)
+			var event = new Event('change');
+			back_page=1
+			subject_category.dispatchEvent(event);	
+			$("#subject").val(hidden_subject)
+			subject.dispatchEvent(event);
+		}
+		if (subject_param){//landed from the journal page
+			for (cat in data){					
+				subjects=(data[cat]).split(';')			
+				for (i = 0; i < subjects.length; i++){
+					if (subjects[i]==subject_param){
+						subject_category_param=cat
+					}
+				}
+			}
+			$("#subject_category").val(subject_category_param)
+			var event = new Event('change');
+			subject_category.dispatchEvent(event);				
+			$("#subject").val(subject_param)	
+			subject.dispatchEvent(event);
+			subject_param=null			
+		}		
+		top_articles()
+	});
+	
+	function user_action(action_type){
+		if (action_type=='input_entered'){
+			document.getElementById('journals_table_body').innerHTML=''
+			find_journals(0);
+		}
+		if (action_type=='cat_changed'){
+			if (!subject_param){
+				change_cat=0
+				find_journals(0)
+			}
+		}	
+		if (action_type=='sub_changed'){
+			find_journals(0)
+		}			
+		if (action_type=='open_checked'){
+			find_journals(0)
+		}		
+	}
+	
+	function find_journals(offset){
+		$(".loader").show()
+		offset_global=offset+20
+		search=document.getElementById("user_input").value.toLowerCase();
+		filter=' filter(regex(lcase(?title),"'+search+'")) ';
+		var e = document.getElementById("subject");
+		var selected_subject = e.options[e.selectedIndex].text;	
+		var selected_category=$('#subject_category').find(":selected").text();
+
+		if (selected_subject!='Please select a category first'){
+			if (selected_subject=='All Subjects (within the category)'){
+				filter="?s <e:category> '"+selected_category+"'. " + filter
+			}else{
+				filter="?s <e:subjects> '"+selected_subject+"'. " + filter
+			}
+		}
+
+		if (document.getElementById("open_check").checked){
+			filter="?s <e:open> 1. "+filter
+		}
+
+		limit='limit 20';
+		var query = [
+		 "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>",
+		 "select DISTINCT ?s ?title ?docs ?citation (xsd:decimal(?impact_) AS ?impact) ?h ?publisher ?open",
+		 "WHERE {",
+			"?s <e:title> ?title;",
+			"<e:publisher> ?publisher;",
+			"<e:count> ?docs;",
+			"<e:citation> ?citation;",
+			"<e:impact> ?impact_;",
+			"<e:h> ?h.",
+			" OPTIONAL {?s <e:open> ?open.}",
+			filter,
+		 "}",
+		 "ORDER BY DESC(?h)",
+		 limit,
+		 'OFFSET '+ offset.toString()
+		].join(" ");
+		journals_db='os_journals'
+		journals_db='tmp'
+		url=endpoint+journals_db+'/query?query='+encodeURIComponent(query) +"&format=json";
+		return $.ajax({
+			url: url,
+			method: 'GET'
+		}).then(function(data) {
+			journals=data['results']['bindings'];
+			if (offset==0){ document.getElementById('journals_table_body').innerHTML=''}
+			journals.forEach(function(journal){
+				if ('title' in journal){
+					title=journal['title']['value'];
+				}
+				publisher=journal['publisher']['value'];
+				log(endpoint+journals_db)
+				issn=journal['s']['value'].replace(endpoint+journals_db+'/','');		
+				docs=journal['docs']['value'];		
+				citation=journal['citation']['value'];		
+				impact=journal['impact']['value'];		
+				h=journal['h']['value'];		
+				if (journal['open']){
+					open='<img border="0" alt="open" src="oa_gold.png" width="16" height="25">'		
+				}else{
+					open=''
+				}
+				
+						
+				document.getElementById('journals_table_body').innerHTML += '<tr>\
+				<td><a href=journal.html?issn='+issn+
+				'&title='+encodeURIComponent(title)+
+				'&publisher='+encodeURIComponent(publisher)+
+				'>'+title+'</td>\
+				<td>'+publisher+'</td>\
+				<td>'+docs+'</td>\
+				<td>'+citation+'</td>\
+				<td>'+impact+'</td>\
+				<td>'+h+'</td>\
+				<td>'+open+'</td>\
+				</tr>'			
+			});
+		$(".loader").hide();
+		});
+	};	
+		
+	function top_articles(){
+	var e = document.getElementById("subject");
+
+	var selected_category=$('#subject_category').find(":selected").text();
+	var selected_subject = e.options[e.selectedIndex].text;	
+
+	if (selected_subject!='Please select a category first'){
+		if (selected_subject=='All Subjects (within the category)'){
+			filter="<e:category> '"+selected_category+"'. " 
+		}else{
+			filter="<e:subject> '"+selected_subject+"'. "
+		}
+	}else{
+		filter=''
+	}
+	
+		limit='limit 20';
+		var query = [
+		 "select ?doi ?title ?citation ?journal ?year ?issn ?publisher (group_concat(?author; separator=', ') as ?authors)",
+		 "WHERE {",
+			"?doi <e:title> ?title;",
+			"<e:cite> ?citation;",
+			"<e:journal> ?journal;",
+			"<e:year> ?year;",
+			"<e:authors> ?author;",
+			"<e:issn> ?issn;",
+			"<e:pub> ?publisher;",
+			filter,
+		 "}",
+		 "group by ?doi ?title ?citation ?journal ?year ?issn ?publisher",
+		 "ORDER BY DESC(?citation)",
+		 limit,
+		].join(" ");	
+		articles_db='os_articles'
+		articles_db='tmp_top'		
+		url=endpoint+articles_db+'/query?query='+encodeURIComponent(query) +"&format=json";
+			return $.ajax({
+				url: url,
+				method: 'GET'
+			}).then(function(data) {
+			articles=data['results']['bindings'];	
+			document.getElementById('articles_table_body').innerHTML=''
+			articles.forEach(function(article){
+				doi=article['doi']['value'].replace(endpoint+articles_db+'/','');
+				title=article['title']['value'];
+				citation=article['citation']['value'];			
+				year=article['year']['value'];	
+				journal=article['journal']['value'];					
+				authors=article['authors']['value'];
+				issn=article['issn']['value'];
+				publisher=article['publisher']['value'];
+				title_td= '<a href=https://doi.org/'+doi+'>' +title+'</a></td>';
+				journal_td=	'<a href=journal.html?issn='+issn+'&title='+encodeURIComponent(journal)+'&publisher='+encodeURIComponent(publisher)+'>' +journal+'</a>'			
+				document.getElementById('articles_table_body').innerHTML += '<tr>\
+				<td>'+title_td+'</td>\
+				<td>'+authors+'</td>\
+				<td>'+journal_td+'</td>\
+				<td>'+year+'</td>\
+				<td>'+citation+'</td>\
+				</tr>'			
+			});
+		});
+	}	
+
+	function getParameterByName(name, url) {
+	    if (!url) url = window.location.href;
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}	
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96980151-3', 'auto');
+  ga('send', 'pageview');
+</script>	
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
+</html>
