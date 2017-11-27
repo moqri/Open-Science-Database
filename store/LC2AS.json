@@ -1,0 +1,95 @@
+{
+    "Agriculture":{
+		"":"Agricultural and Biological Sciences",
+		"Animal culture":"Veterinary"
+		},
+    "Auxiliary sciences of history":"Arts and Humanities",
+    "Bibliography. Library science. Information resources":"Social Sciences",
+    "Education":"Social Sciences",
+    "Fine Arts":"Arts and Humanities",
+    "General Works":"Multidisciplinary",
+    "Geography. Anthropology. Recreation":{
+        "":"Social Sciences",
+        "Environmental sciences":"Environmental Science"
+        },
+    "History (General) and history of Europe":"Arts and Humanities",
+    "History America":"Arts and Humanities",
+    "Language and Literature":"Arts and Humanities",
+    "Law":"Social Sciences",
+    "Medicine":{
+        "":"Medicine",
+        "Dentistry":"Dentistry",
+		"Internal medicine":{
+			"Neurosciences. Biological psychiatry. Neuropsychiatry":"Neuroscience"
+			},
+        "Nursing":"Nursing",
+        "Therapeutics. Pharmacology":["Health Professions","Pharmacology, Toxicology and Pharmaceutics"],
+        "Pediatrics":["Nursing","Medicine"]
+        },
+    "Military Science":"Social Sciences",
+	"Music and books on Music":"Arts and Humanities",
+    "Naval Science":"Engineering",
+    "Philosophy. Psychology. Religion":{
+        "":"Arts and Humanities",
+        "Psychology":"Psychology"
+        },
+    "Political science":"Social Science",
+    "Science":{
+		"":"Multidisciplinary",
+        "Astronomy":"Physics and Astronomy",
+        "Biology (General)":{
+            "":"Agricultural and Biological Sciences",
+            "Genetics":"Biochemistry, Genetics and Molecular Biology",
+            "Ecology":["Agricultural and Biological Sciences","Environmental Science"],
+            "Cytology":"Biochemistry, Genetics and Molecular Biology",
+            "Evolution":"Agricultural and Biological Sciences"
+            },
+        "Botany":"Agricultural and Biological Sciences",
+        "Chemistry":"Chemistry",
+        "Geology":"Earth and Planetary Sciences",
+        "Human anatomy":"Medicine",
+        "Mathematics":"Mathematics",
+        "Microbiology":"Immunology and Microbiology",
+        "Natural history (General)":"Agricultural and Biological Sciences",
+        "Physics":{
+			"":"Physics and Astronomy",
+			"Nuclear and particle physics. Atomic energy. Radioactivity":["Physics and Astronomy","Energy"]
+			},
+        "Physiology":"Medicine",
+        "Science (General)":"Multidisciplinary",
+        "Zoology":"Agricultural and Biological Sciences"
+        },
+    "Social Sciences":{
+        "":"Social Sciences",
+        "Commerce":"Business, Management and Accounting",
+        "Economic history and conditions":"Economics, Econometrics and Finance",
+        "Economic theory. Demography":"Economics, Econometrics and Finance",
+		"Economics as a science":"Economics, Econometrics and Finance",
+        "Finance":"Economics, Econometrics and Finance",
+        "Industries. Land use. Labor":{
+			"":"Economics, Econometrics and Finance",
+			"Management. Industrial management":"Business, Management and Accounting"
+			},
+		"Statistics":"Decision Science"
+        },
+    "Technology":{
+        "":"Engineering",
+        "Chemical technology":"Chemical Engineering",
+        "Electrical engineering. Electronics. Nuclear engineering":{
+            "Electronics":"Computer Science",
+			"Materials of engineering and construction. Mechanics of materials":"Materials Science",
+			"Production of electric energy or power. Powerplants. Central stations":"Energy"
+            },
+        "Engineering":"Engineering",
+		"Mechanical engineering and machinery":{
+			"Energy conservation":"Energy",
+			"Renewable energy sources":"Energy"
+			},
+        "Technology (General)":{
+            "Industrial engineering. Management engineering":{
+                "Information technology":["Business, Management and Accounting","Computer Science"],
+                "Management information systems":["Business, Management and Accounting","Decision Science"]
+                }           
+            }
+        }
+    }
